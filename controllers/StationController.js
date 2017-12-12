@@ -1,4 +1,5 @@
 var getConnecton = require('./db.js')
+var mySQL = require('mysql')
 
 module.exports = {
     find: function(params, callback) {
@@ -33,11 +34,47 @@ module.exports = {
                           'WHERE ' + 
                           'A.StopID = ?';
                 con.query(sql, [params], function(err, Station) {
-                    // console.log(Station);
-                    callback(null, Station);
-                    con.release();
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        // console.log(Station);
+                        callback(null, Station);
+                        con.release();
+                    }
                 });
             }
         });
+    },
+
+    create: function(params, callback) {
+        getConnecton(function(err, con) {
+            if (err) {
+                callback(err, null);
+            } else {
+                // console.log(params);
+                var stopid = params.stopid;
+                var name = params.name;
+                var fare = +params.enterfare;
+                var istrain = params.istrain? 1 : 0;
+                var status = params.isclosed? 1 : 0;
+
+                var columns = ["StopID", "Name", "EnterFare", "IsTrain", "Status"];
+                var sql = "INSERT INTO " + 
+                          "Station " + 
+                          "(??) " + 
+                          "VALUES " + 
+                          "(?, ?, ?, ?, ?)";
+
+                con.query(sql, [columns, stopid, name, fare, istrain, status], function(err, result) {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        // console.log(result);
+                        callback(null, result);
+                        con.release();
+                    }
+                })
+            }
+        })
     }
 };

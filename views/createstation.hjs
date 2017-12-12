@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ title }}</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <form action="/api/station" method="post">
+      <input type="text" name="stopid" placeholder="Stop ID"/>
+      <input type="text" name="name" placeholder="Name"/>
+      <input type="text" name="enterfare" placeholder="Enter Fare"/>        
+      <input id="istrain" type="checkbox" name="istrain"/>
+      <label for="istrain">Is Train</label>      
+      <input id="isclosed" type="checkbox" name="status"/>
+      <label for="isclosed">Is Closed</label>
+      <input type="submit" value="Create Station"/>        
+    </form>
+  </body>
+</html>

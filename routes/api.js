@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var StationController = require('../controllers/StationController')
+var BreezeCardController = require('../controllers/BreezeCardController')
 
 router.get('/:resource', function(req, res, next) {
     var resource = req.params.resource;
@@ -19,6 +20,23 @@ router.get('/:resource', function(req, res, next) {
             }
         });
     } 
+
+    if (resource == 'breezecard') {
+        BreezeCardController.find(req.query, function(err, results) {
+            console.log(results.length);
+            if (err) {
+                res.json({
+                    confirmation: "fail",
+                    message: err.message
+                });
+            } else {
+                res.json({
+                    confirmation: "success", 
+                    message: results
+                });
+            }
+        });
+    }
 });
 
 router.get('/:resource/:stopID', function(req, res, next) {

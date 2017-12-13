@@ -27,7 +27,7 @@ router.get('/:resource/:stopID', function(req, res, next) {
     var stopID = req.params.stopID;
 
     if (resource == 'station') {
-        StationController.findById(stopID, function(err, result) {
+        StationController.findByParameters(stopID, function(err, result) {
             if (err) {
                 res.json({
                     confirmation: "fail",

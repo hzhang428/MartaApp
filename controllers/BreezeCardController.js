@@ -1,6 +1,31 @@
 var getConnection = require('./db.js');
 var mySQL = require('mysql');
 
+function getNewCardNumber() {
+
+}
+
+function updateCardInfo(cardNumber, newOwner, value) {
+    var sql = "UPDATE " + 
+              "BreezeCard " + 
+              "SET";
+    if (newOwner) {
+        sql += " BelongsTo = ?";
+        sql = mySQL.format(sql, newOwner);
+        if (value) {
+            sql += ",";
+        }
+    }
+    if (value) {
+        sql += " Value = ?";
+        sql = mySQL.format(sql, value);
+    }
+
+    sql += " WHERE CardNumber = ?";
+    sql = mySQL.format(sql, cardNumber);
+    return sql;
+}
+
 function getCardByParameters(cardNumber, lower, higher, owner, showConflict) {
     // console.log(cardNumber);
     // console.log(lower);
@@ -97,10 +122,36 @@ module.exports = {
                 var sql = getCardByParameters(cardNumber, lower, higher, owner, showConflict);
                 // console.log(sql);
                 con.query(sql, function(err, BreezeCards) {
-                    callback(null, BreezeCards);
-                    con.release();
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        callback(null, BreezeCards);
+                        con.release();
+                    }
                 });
             }
         });
     },
+
+    update: function(params, callback) {
+        var newOwner = params.newowner;
+        var value = +params.value;
+        var cardNumber = params.cardnumber;
+
+        getConnection(function(err, con) {
+            if (err) {
+                callback(err, null);
+            } else {
+                var sql = updateCardInfo(cardNumber, newOwner, value);
+                con.query(sql, function(err, result) {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        callback(null, result);
+                        con.release;
+                    }
+                })
+            }
+        })
+    }
 }

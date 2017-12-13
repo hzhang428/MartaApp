@@ -65,22 +65,20 @@ router.post('/:resource', function(req, res, next) {
 
 router.put('/:resource', function(req, res, next) {
     var resource = req.params.resource;
-
-    if (resource == 'station') {
-        StationController.update(req.body, function(err, result) {
-            if (err) {
-                res.json({
-                    confirmation: "fail",
-                    message: err.message
-                });
-            } else {
-                res.json({
-                    confirmation: "success",
-                    message: result.message
-                });
-            }
-        });
-    }
+    var controller = Controllers[resource];
+    controller.update(req.body, function(err, result) {
+        if (err) {
+            res.json({
+                confirmation: "fail",
+                message: err.message
+            });
+        } else {
+            res.json({
+                confirmation: "success",
+                message: result.message
+            });
+        }
+    });
 });
 
 module.exports = router

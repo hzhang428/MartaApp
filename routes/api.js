@@ -1,42 +1,25 @@
 var express = require('express');
 var router = express.Router();
-var StationController = require('../controllers/StationController')
-var BreezeCardController = require('../controllers/BreezeCardController')
+var StationController = require('../controllers/StationController');
+var BreezeCardController = require('../controllers/BreezeCardController');
+var Controllers = require('../controllers');
 
 router.get('/:resource', function(req, res, next) {
     var resource = req.params.resource;
-    if (resource == 'station') {
-        StationController.find(req.query, function(err, results) {
-            if (err) {
-                res.json({
-                    confirmation: "fail",
-                    message: err
-                });
-            } else {
-                res.json({
-                    confirmation: "success",
-                    message: results
-                });
-            }
-        });
-    } 
-
-    if (resource == 'breezecard') {
-        BreezeCardController.find(req.query, function(err, results) {
-            console.log(results.length);
-            if (err) {
-                res.json({
-                    confirmation: "fail",
-                    message: err.message
-                });
-            } else {
-                res.json({
-                    confirmation: "success", 
-                    message: results
-                });
-            }
-        });
-    }
+    var controller = Controllers[resource];
+    controller.find(req.query, function(err, results) {
+        if (err) {
+            res.json({
+                confirmation: "fail",
+                message: err
+            });
+        } else {
+            res.json({
+                confirmation: "success",
+                message: results
+            });
+        }
+    });
 });
 
 router.get('/:resource/:stopID', function(req, res, next) {

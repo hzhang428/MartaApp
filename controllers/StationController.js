@@ -76,5 +76,34 @@ module.exports = {
                 })
             }
         })
+    },
+
+    update: function(params, callback) {
+        getConnecton(function(err, con) {
+            if (err) {
+                callback(err, null);
+            } else {
+                // console.log(params);
+                var stopid = params.stopid;
+                var fare = +params.enterfare;
+                var status = params.isclosed? 1 : 0;
+
+                var sql = "UPDATE Station " + 
+                          "SET " + 
+                          "EnterFare = ?, Status = ? " + 
+                          "WHERE " + 
+                          "StopID = ？";
+
+                con.query(sql, [fare, status, stopid], function(err, result) {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        // console.log(result);
+                        callback(null, result);
+                        con.release();
+                    }
+                })
+            }
+        })
     }
 };

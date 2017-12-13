@@ -10,4 +10,8 @@ router.get('/createstation', function(req, res, next) {
   res.render('createstation', null);
 });
 
+router.get('/updatestation', function(req, res, next) {
+  res.render('updatestation', null);
+})
+
 module.exports = router;

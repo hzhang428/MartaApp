@@ -55,7 +55,7 @@ router.post('/:resource', function(req, res, next) {
             } else {
                 res.json({
                     confirmation: "success",
-                    message: result
+                    message: result.message
                 });
             }
         });
@@ -75,7 +75,7 @@ router.put('/:resource', function(req, res, next) {
             } else {
                 res.json({
                     confirmation: "success",
-                    message: result
+                    message: result.message
                 });
             }
         });

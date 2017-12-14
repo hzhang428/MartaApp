@@ -1,8 +1,61 @@
 var getConnection = require('./db.js');
 var mySQL = require('mysql');
 
-function getNewCardNumber() {
+function getRandomInt(min, max) {
+    var min = Math.ceil(min);
+    var max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min;
+}
 
+function generateNewCardNumber() {
+    var number = "";
+    for (let i = 0; i < 16; i++) {
+        number += getRandomInt(0, 10);
+    }
+    return number;
+}
+
+function createNewCardStatement(owner, cardNumber) {
+    var sql = "INSERT INTO " + 
+              "BreezeCard " + 
+              "(??) " + 
+              "VALUES " + 
+              "(?, ?, ?)";
+    var columns = ["BelongsTo", "CardNumber", "Value"];
+    return mySQL.format(sql, [columns, owner, cardNumber, 0]); 
+}
+
+function checkExistenceStatement(cardNumber) {
+    var sql = "SELECT 1 FROM BreezeCard WHERE CardNumber = ?"
+    return mySQL.format(sql, cardNumber);
+}
+
+function createNewCard(owner, cardNumber, connection, callback) {
+    var sql = createNewCardStatement(owner, cardNumber);
+    connection.query(sql, function(err, result) {
+        if (err) {
+            callback(err, null);
+        } else {
+            // console.log(result);
+            callback(null, result);
+            connection.release();
+        }
+    });
+}
+
+function checkExistAndCreate(owner, connection, callback) {
+    var cardNumber = generateNewCardNumber();
+    var checkStatement = checkExistenceStatement(cardNumber);
+    connection.query(checkStatement, function(err, result) {
+        if (err) {
+            callback(err, null);
+        } else if (result.length >= 1) {
+            // console.log(result);
+            checkExistAndCreate(owner, connection, callback);
+        } else {
+            createNewCard(owner, cardNumber, connection, callback);
+        }
+    });
 }
 
 function updateCardInfo(cardNumber, newOwner, value) {
@@ -148,10 +201,21 @@ module.exports = {
                         callback(err, null);
                     } else {
                         callback(null, result);
-                        con.release;
+                        con.release();
                     }
-                })
+                });
             }
-        })
+        });
+    },
+
+    create: function(params, callback) {
+        var owner = params.owner;
+        getConnection(function(err, con) {
+            if (err) {
+                callback(err, null);
+            } else {
+                checkExistAndCreate(owner, con, callback);
+            }
+        });
     }
 }

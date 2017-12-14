@@ -45,22 +45,20 @@ router.get('/:resource/:stopID', function(req, res, next) {
 
 router.post('/:resource', function(req, res, next) {
     var resource = req.params.resource;
-
-    if (resource == 'station') {
-        StationController.create(req.body, function(err, result) {
-            if (err) {
-                res.json({
-                    confirmation: "fail",
-                    message: err.message
-                });
-            } else {
-                res.json({
-                    confirmation: "success",
-                    message: result.message
-                });
-            }
-        });
-    }
+    var controller = Controllers[resource];    
+    controller.create(req.body, function(err, result) {
+        if (err) {
+            res.json({
+                confirmation: "fail",
+                message: err.message
+            });
+        } else {
+            res.json({
+                confirmation: "success",
+                message: "New " + resource + "created"
+            });
+        }
+    });
 });
 
 router.put('/:resource', function(req, res, next) {
@@ -75,7 +73,7 @@ router.put('/:resource', function(req, res, next) {
         } else {
             res.json({
                 confirmation: "success",
-                message: result.message
+                message: resource + " updated"
             });
         }
     });

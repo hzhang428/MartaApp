@@ -1,12 +1,18 @@
 var getConnection = require('./db.js');
 var mySQL = require('mysql');
 
+/*
+ * Get random integer in the range of [min, max)
+ */
 function getRandomInt(min, max) {
     var min = Math.ceil(min);
     var max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min;
 }
 
+/*
+ * Generate a random 16 digit card number 
+ */ 
 function generateNewCardNumber() {
     var number = "";
     for (let i = 0; i < 16; i++) {
@@ -15,6 +21,11 @@ function generateNewCardNumber() {
     return number;
 }
 
+/*
+ * SQL statement to insert a new breezecard record
+ * if owner is null, card won't be assigned
+ * value is default to be zero
+ */
 function createNewCardStatement(owner, cardNumber) {
     var sql = "INSERT INTO " + 
               "BreezeCard " + 
@@ -25,40 +36,18 @@ function createNewCardStatement(owner, cardNumber) {
     return mySQL.format(sql, [columns, owner, cardNumber, 0]); 
 }
 
+/*
+ * SQL statement that check if a card number exist in the breezecard table
+ */
 function checkExistenceStatement(cardNumber) {
     var sql = "SELECT 1 FROM BreezeCard WHERE CardNumber = ?"
     return mySQL.format(sql, cardNumber);
 }
 
-function createNewCard(owner, cardNumber, connection, callback) {
-    var sql = createNewCardStatement(owner, cardNumber);
-    connection.query(sql, function(err, result) {
-        if (err) {
-            callback(err, null);
-        } else {
-            // console.log(result);
-            callback(null, result);
-            connection.release();
-        }
-    });
-}
-
-function checkExistAndCreate(owner, connection, callback) {
-    var cardNumber = generateNewCardNumber();
-    var checkStatement = checkExistenceStatement(cardNumber);
-    connection.query(checkStatement, function(err, result) {
-        if (err) {
-            callback(err, null);
-        } else if (result.length >= 1) {
-            // console.log(result);
-            checkExistAndCreate(owner, connection, callback);
-        } else {
-            createNewCard(owner, cardNumber, connection, callback);
-        }
-    });
-}
-
-function updateCardInfo(cardNumber, newOwner, value) {
+/*
+ * SQL statement to Update breezecard BelongsTo, and Value column
+ */
+function updateCardInfoStatement(cardNumber, newOwner, value) {
     var sql = "UPDATE " + 
               "BreezeCard " + 
               "SET";
@@ -79,7 +68,11 @@ function updateCardInfo(cardNumber, newOwner, value) {
     return sql;
 }
 
-function getCardByID(cardNumber) {
+/*
+ * SQL statement to find breezecard based on the
+ * input card number
+ */
+function getCardByIDStatement(cardNumber) {
     var sql = "SELECT " + 
                 "* " + 
                 "FROM " + 
@@ -89,6 +82,48 @@ function getCardByID(cardNumber) {
     return mySQL.format(sql, cardNumber);
 }
 
+/*
+ * insert a new record given owner and card number in the breezecard table
+ */
+function createNewCard(owner, cardNumber, connection, callback) {
+    var sql = createNewCardStatement(owner, cardNumber);
+    connection.query(sql, function(err, result) {
+        if (err) {
+            callback(err, null);
+        } else {
+            // console.log(result);
+            callback(null, result);
+            connection.release();
+        }
+    });
+}
+
+/*
+ * randomly generate card number and check if it exists in the breezecard table
+ * it not call createNewCard method to insert the record
+ * if not generate random card number until the number does exist in the 
+ * breezecard table
+ */
+function checkExistAndCreate(owner, connection, callback) {
+    var cardNumber = generateNewCardNumber();
+    var checkStatement = checkExistenceStatement(cardNumber);
+    connection.query(checkStatement, function(err, result) {
+        if (err) {
+            callback(err, null);
+        } else if (result.length >= 1) {
+            // console.log(result);
+            checkExistAndCreate(owner, connection, callback);
+        } else {
+            createNewCard(owner, cardNumber, connection, callback);
+        }
+    });
+}
+
+/*
+ * Generate SQL statement based on the input parameters
+ * if showConflict is true, card that's in the conflict table won't be returned
+ * lower and higher values stands for the value range of the breezecard
+ */
 function getCardByParameters(cardNumber, lower, higher, owner, showConflict) {
     // console.log(cardNumber);
     // console.log(lower);
@@ -201,7 +236,7 @@ module.exports = {
             if (err) {
                 callback(err, null);
             } else {
-                var sql = getCardByID(params);
+                var sql = getCardByIDStatement(params);
                 con.query(sql, function(err, BreezeCard) {
                     if (err) {
                         callback(err, null);
@@ -223,7 +258,7 @@ module.exports = {
             if (err) {
                 callback(err, null);
             } else {
-                var sql = updateCardInfo(cardNumber, newOwner, value);
+                var sql = updateCardInfoStatement(cardNumber, newOwner, value);
                 con.query(sql, function(err, result) {
                     if (err) {
                         callback(err, null);

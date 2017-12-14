@@ -79,6 +79,16 @@ function updateCardInfo(cardNumber, newOwner, value) {
     return sql;
 }
 
+function getCardByID(cardNumber) {
+    var sql = "SELECT " + 
+                "* " + 
+                "FROM " + 
+                "BreezeCard " + 
+                "WHERE " + 
+                "CardNumber = ?";
+    return mySQL.format(sql, cardNumber);
+}
+
 function getCardByParameters(cardNumber, lower, higher, owner, showConflict) {
     // console.log(cardNumber);
     // console.log(lower);
@@ -179,6 +189,24 @@ module.exports = {
                         callback(err, null);
                     } else {
                         callback(null, BreezeCards);
+                        con.release();
+                    }
+                });
+            }
+        });
+    },
+
+    findByID: function(params, callback) {
+        getConnection(function(err, con) {
+            if (err) {
+                callback(err, null);
+            } else {
+                var sql = getCardByID(params);
+                con.query(sql, function(err, BreezeCard) {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        callback(null, BreezeCard);
                         con.release();
                     }
                 });

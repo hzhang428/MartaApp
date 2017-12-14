@@ -16,7 +16,7 @@ module.exports = {
         });
     },
 
-    findByParameters: function(params, callback) {
+    findByID: function(params, callback) {
         getConnecton(function(err, con) {
             if (err) {
                 callback(err, null);

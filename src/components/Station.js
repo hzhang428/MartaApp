@@ -4,9 +4,9 @@ class Station extends Component {
     render() {
         return (
             <div>
-                <h2><a href="#">{ this.props.name }</a></h2>
-                <span>{ this.props.stopid }</span><br/>
-                <span>$ { this.props.fare }</span>                      
+                <h2><a href="#">{ this.props.currentStation.name }</a></h2>
+                <span>{ this.props.currentStation.stopid }</span><br/>
+                <span>$ { this.props.currentStation.fare }</span>                      
             </div>
         )
     }

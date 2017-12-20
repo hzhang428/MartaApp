@@ -3,10 +3,11 @@ import styles from './styles';
 
 class Station extends Component {
     render() {
+        const stationStyle = styles.station;        
         return (
-            <div style={styles.container}>
-                <h2 style={styles.header}>
-                    <a style={styles.title} href="#">{ this.props.currentStation.name }</a>
+            <div style={stationStyle.container}>
+                <h2 style={stationStyle.header}>
+                    <a style={stationStyle.title} href="#">{ this.props.currentStation.name }</a>
                 </h2>
                 <span>{ this.props.currentStation.stopid }</span><br/>
                 <span>$ { this.props.currentStation.fare }</span>                      

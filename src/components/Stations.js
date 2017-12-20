@@ -23,9 +23,9 @@ class Stations extends Component {
 
         return (
             <div>
-                <ol>
+                <ul>
                     { stations }
-                </ol>
+                </ul>
             </div>
         )
     }
